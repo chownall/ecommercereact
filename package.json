@@ -64,7 +64,8 @@
     "build": "react-scripts --openssl-legacy-provider build",
     "test": "react-scripts eject",
     "eject": "react-scripts eject",
-    "deploy": "npm run build && git add build/ && git commit -m \"Deploy to GitHub Pages\" && git push github main"
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -85,5 +86,6 @@
     ]
   },
   "devDependencies": {
+    "gh-pages": "^6.3.0"
   }
 }
