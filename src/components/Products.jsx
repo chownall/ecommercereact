@@ -7,17 +7,24 @@ import "react-loading-skeleton/dist/skeleton.css";
 
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import ProductCard from "./ProductCard";
+import MiniCart from "./MiniCart";
+import "./Products.css";
 
 const Products = () => {
   const [data, setData] = useState([]);
   const [filter, setFilter] = useState(data);
   const [loading, setLoading] = useState(false);
+  const [isMiniCartOpen, setIsMiniCartOpen] = useState(false);
+  const [recentlyAddedProduct, setRecentlyAddedProduct] = useState(null);
   let componentMounted = true;
 
   const dispatch = useDispatch();
 
   const addProduct = (product) => {
     dispatch(addCart(product));
+    setRecentlyAddedProduct(product);
+    setIsMiniCartOpen(true);
   };
 
   useEffect(() => {
@@ -74,96 +81,59 @@ const Products = () => {
   const ShowProducts = () => {
     return (
       <>
-        <div className="buttons text-center py-5">
+        <div className="filter-buttons">
           <button
-            className="btn btn-outline-dark btn-sm m-2"
+            className="filter-btn active"
             onClick={() => setFilter(data)}
           >
-            All
+            All Products
           </button>
           <button
-            className="btn btn-outline-dark btn-sm m-2"
+            className="filter-btn"
             onClick={() => filterProduct("men's clothing")}
           >
             Men's Clothing
           </button>
           <button
-            className="btn btn-outline-dark btn-sm m-2"
+            className="filter-btn"
             onClick={() => filterProduct("women's clothing")}
           >
             Women's Clothing
           </button>
           <button
-            className="btn btn-outline-dark btn-sm m-2"
+            className="filter-btn"
             onClick={() => filterProduct("jewelery")}
           >
-            Jewelery
+            Jewelry
           </button>
           <button
-            className="btn btn-outline-dark btn-sm m-2"
+            className="filter-btn"
             onClick={() => filterProduct("electronics")}
           >
             Electronics
           </button>
         </div>
 
-        {filter.map((product) => {
-          return (
-            <div
-              id={product.id}
-              key={product.id}
-              className="col-md-4 col-sm-6 col-xs-8 col-12 mb-4"
-            >
-              <div className="card text-center h-100" key={product.id}>
-                <img
-                  className="card-img-top p-3"
-                  src={product.image}
-                  alt="Card"
-                  height={300}
-                />
-                <div className="card-body">
-                  <h5 className="card-title">
-                    {product.title.substring(0, 12)}...
-                  </h5>
-                  <p className="card-text">
-                    {product.description.substring(0, 90)}...
-                  </p>
-                </div>
-                <ul className="list-group list-group-flush">
-                  <li className="list-group-item lead">$ {product.price}</li>
-                  {/* <li className="list-group-item">Dapibus ac facilisis in</li>
-                    <li className="list-group-item">Vestibulum at eros</li> */}
-                </ul>
-                <div className="card-body">
-                  <Link
-                    to={"/product/" + product.id}
-                    className="btn btn-dark m-1"
-                  >
-                    Buy Now
-                  </Link>
-                  <button
-                    className="btn btn-dark m-1"
-                    onClick={() => {
-                      toast.success("Added to cart");
-                      addProduct(product);
-                    }}
-                  >
-                    Add to Cart
-                  </button>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+        <div className="products-grid">
+          {filter.map((product) => (
+            <ProductCard 
+              key={product.id} 
+              product={product}
+              onAddToCart={addProduct}
+            />
+          ))}
+        </div>
       </>
     );
   };
+
   return (
     <>
       <div className="container my-3 py-3">
         <div className="row">
           <div className="col-12">
             <h2 className="display-5 text-center">Latest Products</h2>
+            <p className="text-center text-muted">Discover our amazing collection</p>
             <hr />
           </div>
         </div>
@@ -171,6 +141,13 @@ const Products = () => {
           {loading ? <Loading /> : <ShowProducts />}
         </div>
       </div>
+
+      {/* Mini Cart */}
+      <MiniCart 
+        isOpen={isMiniCartOpen}
+        onClose={() => setIsMiniCartOpen(false)}
+        addedProduct={recentlyAddedProduct}
+      />
     </>
   );
 };
